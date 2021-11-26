@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const ApiError = require('../errorHandler/ApiError');
 
-const { PRIVATE_KEY } = process.env;
+const { PRIVATE_KEY = 'privite-key' } = process.env;
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;

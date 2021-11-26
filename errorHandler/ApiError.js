@@ -6,7 +6,7 @@ class ApiError extends Error {
   }
 
   static userError(message) {
-    return new ApiError(401, message);
+    return new ApiError(400, message);
   }
 
   static userExistError(message) {

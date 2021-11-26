@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const ApiError = require('../errorHandler/ApiError');
 const User = require('../models/user');
 
-const { PRIVATE_KEY } = process.env;
+const { PRIVATE_KEY = 'privite-key' } = process.env;
 
 // REGISTRATION//
 const registration = (req, res, next) => {
@@ -16,14 +16,16 @@ const registration = (req, res, next) => {
   User.findOne({ email })
     .then((regUser) => {
       if (regUser) {
-        throw ApiError.userExistError('user allready exist');
+        throw ApiError.userExistError(`${email} email allready exist`);
       }
       return bcrypt.hash(password, 10).then((hash) => {
         User.create({
           email,
           password: hash,
           name,
-        }).then((user) => res.status(200).send({ email: user.email, name: user.name }));
+        }).then((user) =>
+          res.status(200).send({ email: user.email, name: user.name })
+        );
       });
     })
     .catch(next);
@@ -59,7 +61,9 @@ const getUser = (req, res, next) => {
   const userId = req.user.id;
 
   User.findById(userId)
-    .then((user) => res.status(200).send({ email: user.email, name: user.name }))
+    .then((user) =>
+      res.status(200).send({ email: user.email, name: user.name })
+    )
     .catch(next);
 };
 
@@ -71,7 +75,7 @@ const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     userId,
     { email, name },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((user) => {
       if (user) {
