@@ -5,16 +5,23 @@ class ApiError extends Error {
     this.message = message;
   }
 
-  static userError(message) {
-    return new ApiError(400, message);
-  }
+  // static userError(status, message) {
+  //   return new ApiError(status, message);
+  // }
 
-  static userExistError(message) {
-    return new ApiError(409, message);
-  }
+  // static userExistError(status, message) {
+  //   return new ApiError(status, message);
+  // }
 
-  static notFoundError(message) {
-    return new ApiError(404, message);
-  }
+  // static notFoundError(status, message) {
+  //   return new ApiError(status, message);
+  // }
+  // static authError(status, message) {
+  //   return new ApiError(status, message);
+  // }
+  // static forbiddenError(status, message) {
+  //   return new ApiError(status, message);
+  // }
 }
+
 module.exports = ApiError;
