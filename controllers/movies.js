@@ -1,5 +1,11 @@
 const ApiError = require('../errorHandler/ApiError');
 const Movie = require('../models/movie');
+const {
+  notFoundErrorStatus,
+  notFoundErrorMessage,
+  forbiddenErrorStatus,
+  forbiddenErrorMessage,
+} = require('../utils/constants');
 
 // GET ALL SAVED MOVIES
 const getMovies = (req, res, next) => {
@@ -37,12 +43,12 @@ const removeMovie = (req, res, next) => {
   const { movieId } = req.params;
 
   Movie.findById(movieId)
-    .orFail(ApiError.notFoundError('movie`s not found'))
+    .orFail(new ApiError(notFoundErrorStatus, notFoundErrorMessage))
     .then((movie) => {
       if (req.user.id === movie.owner.toString()) {
         return Movie.deleteOne({ _id: movie._id }).then(() => res.status(200).send('movie has been removed'));
       }
-      throw ApiError.userError('you can`t delete another user movie');
+      throw new ApiError(forbiddenErrorStatus, forbiddenErrorMessage);
     })
     .catch(next);
 };
