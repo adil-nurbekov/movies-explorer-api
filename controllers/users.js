@@ -11,6 +11,8 @@ const {
   inputErrorMessage,
   invalidErrorMessage,
   forbiddenErrorStatus,
+  authErrorStatus,
+  forbiddenErrorMessage,
 } = require('../utils/constants');
 
 const { PRIVATE_KEY = 'privite-key' } = process.env;
@@ -27,7 +29,7 @@ const registration = (req, res, next) => {
       if (regUser) {
         throw new ApiError(
           userExistErrorStatus,
-          `${email} ${userExistErrorMessage}`,
+          `${email} ${userExistErrorMessage}`
         );
       }
       return bcrypt.hash(password, 10).then((hash) => {
@@ -35,7 +37,9 @@ const registration = (req, res, next) => {
           email,
           password: hash,
           name,
-        }).then((user) => res.status(200).send({ email: user.email, name: user.name }));
+        }).then((user) =>
+          res.status(200).send({ email: user.email, name: user.name })
+        );
       });
     })
     .catch(next);
@@ -51,11 +55,11 @@ const login = (req, res, next) => {
   User.findOne({ email })
     .then((user) => {
       if (!user) {
-        throw new ApiError(userErrorStatus, invalidErrorMessage);
+        throw new ApiError(authErrorStatus, invalidErrorMessage);
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          throw new ApiError(userErrorStatus, invalidErrorMessage);
+          throw new ApiError(authErrorStatus, invalidErrorMessage);
         }
         const token = jwt.sign({ id: user._id }, `${PRIVATE_KEY}`, {
           expiresIn: '7d',
@@ -71,7 +75,9 @@ const getUser = (req, res, next) => {
   const userId = req.user.id;
 
   User.findById(userId)
-    .then((user) => res.status(200).send({ email: user.email, name: user.name }))
+    .then((user) =>
+      res.status(200).send({ email: user.email, name: user.name })
+    )
     .catch(next);
 };
 
@@ -83,7 +89,7 @@ const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     userId,
     { email, name },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((user) => {
       if (user) {
@@ -91,7 +97,12 @@ const updateUser = (req, res, next) => {
       }
       throw new ApiError(forbiddenErrorStatus, userExistErrorMessage);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        return res.status(409).send(forbiddenErrorMessage);
+      }
+      next();
+    });
 };
 
 module.exports = {

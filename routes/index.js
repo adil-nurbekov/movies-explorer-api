@@ -5,15 +5,12 @@ const userRouter = require('./users');
 const moviesRouter = require('./movies');
 const ApiError = require('../errorHandler/ApiError');
 
-const rateLimiter = require('../middlewares/rateLimiter');
 const {
   notFoundErrorStatus,
   notFoundErrorMessage,
 } = require('../utils/constants');
 const { registration, login } = require('../controllers/users');
 const auth = require('../middlewares/auth');
-
-router.use(rateLimiter); // REQUEST LIMITER
 
 // ROUTER FOR SIGN UP
 router.post(
@@ -25,7 +22,7 @@ router.post(
       password: Joi.string().required().min(5),
     }),
   }),
-  registration,
+  registration
 );
 
 // ROUTER FOR SIGN IN
@@ -37,7 +34,7 @@ router.post(
       password: Joi.string().required().min(5),
     }),
   }),
-  login,
+  login
 );
 
 router.use(auth); // AUTHORIZATION ROUTER

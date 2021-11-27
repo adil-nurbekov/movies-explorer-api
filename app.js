@@ -8,6 +8,7 @@ const { errors } = require('celebrate');
 const router = require('./routes/index');
 const errorHandler = require('./middlewares/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const rateLimiter = require('./middlewares/rateLimiter');
 
 const { PORT = 3000 } = process.env;
 const { BD_URL = 'mongodb://localhost:27017/moviesbd' } = process.env;
@@ -25,6 +26,8 @@ mongoose.connect(`${BD_URL}`, {
 });
 
 app.use(requestLogger); // REQUEST LOGGER
+
+router.use(rateLimiter); // REQUEST LIMITER
 
 app.use('/', router); // ALL REQUESTS
 
